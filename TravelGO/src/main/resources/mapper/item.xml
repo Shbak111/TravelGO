@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	<mapper namespace="com.ssafy.item.model.mapper.ItemMapper">
+		
+		<select id="selectItem" parameterType="int" resultType="item">
+			select * from items where item_id=#{itemId}
+		</select>
+		
+		<select id="selectAllItems" resultType="item">
+			select * from items
+		</select>
+		
+		<select id="selectMyItems" parameterType="string" resultType="item">
+			select * from
+			useritems ui
+			join 
+			items i
+			using (item_id)
+			where ui.user_id=#{userId}
+		</select>
+		
+		<insert id="addUserItem" parameterType="purchaseItem">
+			insert into useritems (user_id, item_id)
+			values (#{userId},#{itemId})
+		</insert>
+		
+		<!-- 관리자 전용 아이템 추가 -->
+		<insert id="addItems" parameterType="item">
+			insert into items (item_name,price, item_type)
+			values (#{itemName},#{price},#{itemType})
+		</insert>
+		
+		<update id="useProfileItem" parameterType="usingProfileItem">
+			update users set profile_img=#{profileImg}
+			where user_id=#{userId}
+		</update>
+		
+		<update id="useBackgroundItem" parameterType="usingBackgroundItem">
+			update users set background_img=#{backgroundImg}
+			where user_id=#{userId}
+		</update>
+		
+		
+	</mapper>

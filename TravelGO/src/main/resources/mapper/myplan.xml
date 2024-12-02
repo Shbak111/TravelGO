@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.myplan.model.mapper.MyPlanMapper">
+	<!-- 내 플랜 모두 조회 -->
+	<select id="getMyPlan" parameterType="string" resultType="map">
+		select myplan_id, myplan_title, myplan_detail, created_at
+		from myplans
+		where user_id = #{userId}
+	</select>
+	
+	<!-- 내 플랜 상세 조회 -->
+	<select id="getMyPlanDetail" parameterType="int" resultType="detailMyPlanResponse">
+		select myplan_id, myplan_title, myplan_detail, created_at, distance
+		from myplans
+		where myplan_id = #{myplanId}
+	</select>
+	
+	<!-- 특정 플랜 관광지들 조회 -->
+	<select id="getMyPlanAttractions" parameterType="int" resultType="map">
+		select a.no, title, content_type_name, sido_name, gugun_name, first_image1, a.addr1, a.latitude, a.longitude
+		from myplan_attractions p
+		join attractions a
+		on p.attraction_id = a.no
+		join contenttypes s
+		using(content_type_id)
+		join sidos
+		on area_code = sido_code
+		join guguns g
+		on area_code = g.sido_code and si_gun_gu_code = gugun_code
+		where myplan_id = #{myplanId}
+		order by myplan_order
+	</select>
+	
+	<!-- 내 플랜 등록하기 -->
+	<insert id="addMyPlan" parameterType="addMyPlanRequest" useGeneratedKeys="true" keyProperty="myplanId">
+		insert into myplans (user_id, myplan_title, myplan_detail, distance)
+		values (#{userId}, #{myplanTitle}, #{myplanDetail}, #{distance})
+	</insert>
+	
+	<!-- 내 플랜 관광지 등록 -->
+	<insert id="addMyPlanAttractions" parameterType="map">
+		insert into myplan_attractions
+		values (#{myplanId}, #{attractionId}, #{myplanOrder})
+	</insert>
+	
+	<!-- 내 특정 플랜 수정 -->
+	<update id="updateMyPlan" parameterType="addMyPlanRequest">
+		update myplans
+		set myplan_title = #{myplanTitle}, myplan_detail = #{myplanDetail}, distance = #{distance}
+		where myplan_id = #{myplanId}
+	</update>
+	
+	<!-- 내 플랜 관광지 모두 삭제 -->
+	<delete id="deleteMyPlanAttractions" parameterType="int">
+		delete from myplan_attractions
+		where myplan_id = #{myplanId}
+	</delete>
+	
+	<!-- 내 플랜 관광지 모두 삭제 -->
+	<delete id="deleteMyPlan" parameterType="int">
+		delete from myplans
+		where myplan_id = #{myplanId}
+	</delete>
+</mapper>
+

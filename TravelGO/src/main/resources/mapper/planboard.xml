@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.planboard.model.mapper.PlanBoardMapper">
+	<!-- 플랜 게시판 글 조회 -->
+	<select id="getPlanBoard" resultType="map">
+		select plan_id, user_name, plan_title, b.created_at, hit
+		from plan_boards b join users u
+		using(user_id)
+		where 1=1
+	        <if test="keyword != null and keyword != ''">
+	            and plan_title like concat('%', #{keyword}, '%')
+	        </if>
+		order by b.created_at DESC
+	</select>
+	
+	<!-- 특정 게시판 글 상세 조회 -->
+	<select id="getPlanBoardDetail" parameterType="int" resultType="detailPlanBoardResponse">
+		select plan_id, myplan_id, b.user_id, user_name, plan_title, plan_detail, b.created_at, distance, hit
+		from plan_boards b join users u
+		using(user_id)
+		join myplans
+		using(myplan_id)
+		where plan_id = #{planId}
+	</select>
+	
+	<!-- 특정 게시판 글 관광지 조회 -->
+	<select id="getAttractions" resultType="map">
+		select title, content_type_name, sido_name, gugun_name, first_image1, addr1
+		from plan_boards join myplan_attractions
+		using(myplan_id)
+		join attractions
+		on attraction_id = no
+		join contenttypes
+		using(content_type_id)
+		join sidos
+		on area_code = sido_code
+		join guguns g
+		on area_code = g.sido_code and si_gun_gu_code = gugun_code
+		where plan_id = #{planId}
+		order by myplan_order
+	</select>
+	
+	<!-- 게시판 글 작성 -->
+	<insert id="addPlanBoard" parameterType="addPlanBoard">
+		insert into plan_boards (user_id, myplan_id, plan_title, plan_detail)
+		values (#{userId}, #{myplanId}, #{planTitle}, #{planDetail});
+	</insert>
+	
+	<!-- 게시판 글 수정 -->
+	<update id="updatePlanBoard" parameterType="addPlanBoard">
+		update plan_boards
+		set plan_title = #{planTitle}, plan_detail = #{planDetail}, myplan_id = #{myplanId}
+		where plan_id = #{planId}
+	</update>
+	
+	<!-- 게시판 글 삭제 -->
+	<delete id="deletePlanBoard" parameterType="int">
+		delete from plan_boards
+		where plan_id = #{planId}
+	</delete>
+	
+	<!-- 특정 글 좋아요 여부 -->
+	<select id="getHit">
+		select count(*)
+		from plan_hits
+		where plan_id = #{planId} and user_id = #{userId}
+	</select>
+	
+	<!-- 특정 글 좋아요 등록 -->
+	<insert id="addHit">
+		insert into plan_hits
+		values (#{planId}, #{userId})
+	</insert>
+	
+	<!-- 특정 글 hit 컬럼 갱신 -->
+	<update id="updateHit">
+		update plan_boards
+		set hit = hit+#{value}
+		where plan_id = #{planId}
+	</update>
+	
+	<!-- 특정 글 좋아요 취소 -->
+	<delete id="deleteHit">
+		delete from plan_hits
+		where plan_id = #{planId} and user_id = #{userId}
+	</delete>
+	
+	<!-- 특정 글의 모든 댓글 조회 -->
+	<select id="selectComments" parameterType="int" resultType="planComments">
+		select comment_id, plan_id, user_id, user_name, content, plan_comments.created_at
+		from plan_comments
+		join users
+		using(user_id)
+		where plan_id = #{planId}
+		order by plan_comments.created_at desc
+	</select>
+	
+	<!-- 특정 글에 댓글 작성 -->
+	<insert id="addComments" parameterType="planComments">
+		insert into plan_comments (plan_id, user_id, content)
+		values (#{planId}, #{userId}, #{content})
+	</insert>
+	
+	<!-- 특정 댓글 수정 -->
+	<update id="updateComments" parameterType="planComments">
+		update plan_comments
+		set content = #{content}
+		where comment_id = #{commentId}
+	</update>
+	
+	<!-- 특정 댓글 삭제 -->
+	<delete id="deleteComments">
+		delete from plan_comments
+		where comment_id = #{commentId}
+	</delete>
+</mapper>
+

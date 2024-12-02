@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	<mapper namespace="com.ssafy.user.model.mapper.UserMapper">
+		<insert id="signup" parameterType="user">
+			insert into users (user_id, user_name, password, refresh_token)
+			values (#{userId}, #{userName}, #{password}, #{refreshToken});
+		</insert>
+		
+		<select id="selectUser" parameterType="string" resultType="user">
+			select * from users where user_id=#{userId}
+		</select>
+		
+		<update id="updateUserMileAge" parameterType="user">
+			update users set mileage=#{mileage}
+			where user_id=#{userId}
+		</update>
+		
+		<update id="setRefreshToken" parameterType="userRefreshToken">
+			update users set refresh_token=#{refreshToken}
+			where user_id=#{userId}
+		</update>
+		
+		<update id="deleteRefreshToken" parameterType="string">
+			update users set refresh_token=null
+			where user_id=#{userId}
+		</update>
+		
+		<select id="findByToken" parameterType="string" resultType="int">
+			select count(*) from users where refresh_token = #{refreshToken}
+		</select>
+		
+		<update id="addWriteMileageAndRank" parameterType="string">
+			update users set 
+			mileage=mileage+300,
+			rank_point=rank_point+300
+			where user_id=#{userId}
+		</update>
+		
+		<update id="addLikeMileageAndRank" parameterType="string">
+			update users set 
+			mileage=mileage+100,
+			rank_point=rank_point+100
+			where user_id=#{userId}
+		</update>
+		
+		<update id="subLikeMileageAndRank" parameterType="string">
+			update users set 
+			mileage=mileage-100,
+			rank_point=rank_point-100
+			where user_id=#{userId}
+		</update>
+	</mapper>

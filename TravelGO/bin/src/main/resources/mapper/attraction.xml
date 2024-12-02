@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.attraction.model.mapper.AttractionMapper">
+	<!-- 관광지 조회 -->
+	<select id="getAttractions" parameterType="attraction" resultType="map">
+		select title, first_image1, addr1
+		from attractions
+		where area_code = #{areaCode} and si_gun_gu_code = #{siGunGuCode} and content_type_id = #{contentTypeId};
+	</select>
+	
+	<!-- 관광지 상세정보 조회 -->
+	<select id="getDetailAttraction" parameterType="int" resultType="detailAttractionResponse">
+		select *
+		from attractions
+		where no = #{no};
+	</select>
+	
+	<!-- 관광지 유형 이름 조회 -->
+	<select id="getContentTypeName" parameterType="int" resultType="string">
+		select content_type_name
+		from contenttypes
+		where content_type_id = #{contentTypeId};
+	</select>
+</mapper>
+

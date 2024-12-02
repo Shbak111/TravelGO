@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	<mapper namespace="com.ssafy.review.model.mapper.ReviewMapper">
+		<select id="selectAllReviews" resultType="review">
+			select * from reviews
+		</select>
+		
+		<select id="selectMyReviews" parameterType="string" resultType="review">
+			select * from reviews where user_id=#{userId}
+		</select>
+		
+		<select id="detail" parameterType="int" resultType="review">
+			select * from reviews where review_id=#{reviewId}
+		</select>
+		
+		<insert id="add" parameterType="review">
+			insert into reviews (user_id, review_title ,review_content) 
+			values (#{userId}, #{reviewTitle},#{reviewContent})
+		</insert>
+		
+		<delete id="delete" parameterType="int">
+			delete from reviews where review_id=#{reviewId}
+		</delete>
+		
+		<select id="update" parameterType="review" resultType="review">
+			update reviews set review_title=#{reviewTitle}, review_content=#{reviewContent}
+			where review_id=#{reviewId}
+			RETURNING *
+		</select>
+		
+		<select id="searchReviewsByKeyword" parameterType="string" resultType="review">
+			 SELECT * FROM reviews WHERE review_title LIKE CONCAT('%', #{keyword}, '%')
+		</select>
+		
+		<select id="findAllHits" parameterType="int" resultType="hit">
+			select * from review_hits where review_id=#{reviewId}
+		</select>
+		
+		<insert id="addHit" parameterType="hit">
+			insert into review_hits (review_id, user_id)
+			values (#{reviewId},#{userId})
+		</insert>
+		
+		<update id="increaseReviewHit" parameterType="hit">
+			UPDATE reviews
+	        SET hit = hit + 1
+	        WHERE review_id = #{reviewId}
+		</update>
+		
+		<delete id="deleteHit" parameterType="hit">
+			delete from review_hits 
+			where review_id=#{reviewId} and user_id=#{userId}
+		</delete>
+		
+		<update id="decreaseReviewHit" parameterType="hit">
+			UPDATE reviews
+	        SET hit = hit - 1
+	        WHERE review_id = #{reviewId}
+		</update>
+		
+	</mapper>
